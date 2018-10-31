@@ -1,0 +1,5 @@
+1)To replace space with _   eg: "Payment exchange rate" - "Payment_Exchange_Rate"
+JSON.parse(x).dimension["0"]["0"].name.replace(/\w+/g, function(txt) {return txt.charAt(0).toUpperCase() + txt.substr(1);}).replace(/\s/g, '_')
+
+2)To replace space with  eg: "Payment exchange rate" - "PaymentExchangeRate"
+JSON.parse(x).dimension["0"]["0"].name.replace(/\w+/g, function(txt) {return txt.charAt(0).toUpperCase() + txt.substr(1);}).replace(/\s/g, '')
