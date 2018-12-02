@@ -20,3 +20,34 @@ JSON.parse(x).dimension["0"]["0"].name.replace(/\w+/g, function(txt) {return txt
 
       var z = outer();
       z(5) Ans===50;
+ ------------------------------------------------------------------------------------------------------------------------------------------   
+   4)Count numbeer occurence in array
+   Ans  My answer
+            var a =[1,1,2,3,4,,2,2];
+                var count ={};
+                function myFunction(a) {
+
+                    for (var i=0;i<a.length;i++){
+                    var c=0;
+                        for (var j=0;j<a.length;j++){
+                            if(a[i]==a[j]){
+                            c=c+1;
+                            }
+                            count[a[i]]=c;
+                          }
+                        }
+                     console.log(count);
+                }
+                
+          Internet answer
+          var arr = [5, 5, 5, 2, 2, 2, 2, 2, 9, 4];
+            var counts = {};
+
+            for (var i = 0; i < arr.length; i++) {
+              var num = arr[i];
+              counts[num] = counts[num] ? counts[num] + 1 : 1;
+            }
+
+            console.log(counts[5], counts[2], counts[9], counts[4]);
+            
+-------------------------------------------------------------------------------------------------------------------------------------------
