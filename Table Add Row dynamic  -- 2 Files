@@ -328,3 +328,312 @@ th.style-scope.cascade-bucket-range {
 </script>
 </body>
 </html>
+
+
+
+
+
+
+=====================================================================================================================================
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+	<link rel="import" href="../bower_components/polymer/polymer.html">
+</head>
+
+<body unresolved>
+<style>
+/* table{
+    table-layout: fixed;
+    width: 200px;
+}
+th, td {
+    overflow: hidden;
+    width: 150px;
+} */
+.deleteButton{
+	min-width: 2em !important;
+	background-color: #868686 !important;
+}
+.editButton{
+	min-width: 2em !important;
+	background-color: #868686 !important;
+}
+td{
+	text-align: center;
+}
+paper-button#addRow {
+	min-width: 2em !important;
+	position: absolute;
+	top: -2.5em;
+	right: 0;
+	margin-right: 2%;
+}
+div#tableDiv {
+    width: 513px;
+    position: relative;
+}
+th.style-scope.cascade-bucket-range {
+    font-weight: 700;
+    font-family: "GE Inspira", "ge-inspira", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+</style>
+<body>
+<dom-module id="cascade-bucket-range">
+	<template>
+		<div id="tableDiv">
+		<span><paper-button raisedButton style="font-size:12px" id="addRow" on-tap='_addRow' class="btn btn-success"><i class="fa fa-plus" aria-hidden="true"></i></paper-button ></span>
+		<table id="bucketsTable" style="border:0;">
+          <tr>
+            <th>Bucket Name</th>
+            <th>Min</th>
+            <th>Max</th>
+						<th>Action</th>
+          </tr>
+          <tr>
+            <td>
+								<input type="hidden" id="bucketCurrent" name="current" value="0" disabled>
+                <input type="text" id="bucketCurrentName" value="Current" disabled>
+            </td>
+            <td>
+							<input type="text" id="bucketCurrentMin" value="-1" disabled>
+						</td>
+            <td>
+							<input type="text" id="bucketCurrentMax" value="<0" disabled>
+						</td>
+						<td></td>
+          </tr>
+          <tr>
+            <td>
+              <input type="hidden" id="bucket1row" value="1" disabled>
+              <input type="text" id="bucket1Name" value="0 to 30">
+            </td>
+            <td><input type="number" id="bucket1Min" value="0"></td>
+            <td><input type="number" id="bucket1Max" value="30"></td>
+						<td>
+					 		<paper-button  raisedButton style="font-size:12px" on-tap="_deleteRow" class="btn btn-success deleteButton"><i class="fa fa-trash-o"></i></paper-button >
+						</td>
+
+          </tr>
+          <tr>
+            <td>
+              <input type="hidden" id="bucket2row" value="2" disabled>
+              <input type="text" id="bucket2Name" value="31 to 60">
+            </td>
+            <td><input type="number" id="bucket2Min" value="31"></td>
+            <td><input type="number" id="bucket2Max" value="60"></td>
+						<td>
+					 		<paper-button  raisedButton style="font-size:12px" on-tap="_deleteRow" class="btn btn-success deleteButton"><i class="fa fa-trash-o"></i></paper-button >
+						</td>
+          </tr>
+          <tr>
+            <td>
+              <input type="hidden" id="bucket3row" value="3" disabled>
+              <input type="text" id="bucket3Name" value="61 to 90">
+            </td>
+            <td><input type="number" id="bucket3Min" value="61"></td>
+            <td><input type="number" id="bucket3Max" value="90"></td>
+						<td>
+					 		<paper-button  raisedButton style="font-size:12px" on-tap="_deleteRow" class="btn btn-success deleteButton"><i class="fa fa-trash-o"></i></paper-button >
+						</td>
+          </tr>
+          <tr>
+            <td>
+              <input type="hidden" id="bucket4row" value="4" disabled>
+              <input type="text" id="bucket4Name" value="91 to 120">
+            </td>
+            <td><input type="number" id="bucket4Min" value="91"></td>
+            <td><input type="number" id="bucket4Max" value="120"></td>
+						<td>
+					 		<paper-button  raisedButton style="font-size:12px" on-tap="_deleteRow" class="btn btn-success deleteButton"><i class="fa fa-trash-o"></i></paper-button >
+						</td>
+          </tr>
+          <tr>
+            <td>
+              <input type="hidden" id="bucket5row" value="5" disabled>
+              <input type="text" id="bucket5Name" value="121 to 180">
+            </td>
+            <td><input type="number" id="bucket5Min" value="121"></td>
+            <td><input type="number" id="bucket5Max" value="180"></td>
+						<td>
+							<paper-button  raisedButton style="font-size:12px" on-tap="_deleteRow" class="btn btn-success deleteButton"><i class="fa fa-trash-o"></i></paper-button >
+						</td>
+          </tr>
+          <tr>
+            <td>
+              <input type="hidden" id="bucket6row" value="6" disabled>
+              <input type="text" id="bucket6Name" value="181 to 365">
+            </td>
+            <td><input type="number" id="bucket6Min" value="181"></td>
+            <td><input type="number" id="bucket6Max" value="365"></td>
+						<td>
+							<paper-button  raisedButton style="font-size:12px"  on-tap="_deleteRow" class="btn btn-success deleteButton"><i class="fa fa-trash-o"></i></paper-button >
+						</td>
+          </tr>
+          <tr>
+            <td>
+								<input type="hidden" id="bucketLast" name="last" value="0" disabled>
+								<input type="text" id="bucketLastName" value="Last" disabled>
+            </td>
+            <td>
+							<input type="text" id="bucketLastMin" value="366" disabled>
+						</td>
+            <td>
+							<input type="text" id="bucketLastMax" value=">365" disabled>
+						</td>
+						<td></td>
+          </tr>
+        </table>
+			</div>
+	</template>
+</dom-module>
+</body>
+<script>
+	Polymer({
+        is: "cascade-bucket-range",
+        properties:{
+        },
+        isvalid: function(k){
+          for (var i=0, l=k.length; i<l-1; i++)
+          {
+           // if(k[i].max - k[i+1].min >= 0 || k[i].max>365 || k[i].min>=365)
+					if(k[i].max - k[i+1].min >= 0)
+           return false;
+          }
+          return true;
+        },
+        _getBuckets: function(){
+        	buckets = [];
+					var nodelistItem=Polymer.dom(this.root).querySelectorAll("[id$='row'][id^='bucket']");
+					// Current Bucket
+					var str1 = nodelistItem[0].id
+					str1 = str1.slice(0, -3);
+					bucket = {};
+					bucket.bucket_no = parseInt(this.$["bucketCurrent"].value);
+					bucket.name = this.$["bucketCurrentName"].value;
+					bucket.min = parseInt(this.$$('#'+str1+"Min").value)-1;
+					bucket.max = parseInt(this.$$('#'+str1+"Min").value)-1;
+					buckets.push(bucket);
+					for(var i=0; i<nodelistItem.length; i++){
+							bucket = {};
+							bucket.bucket_no = parseInt(nodelistItem[i].value);
+							var str=nodelistItem[i].id
+							str = str.slice(0, -3);
+							bucket.name  = this.$$('#'+str+"Name").value;
+	    				bucket.min   = parseInt(this.$$('#'+str+"Min").value);
+	    				bucket.max   = parseInt(this.$$('#'+str+"Max").value);
+	    				buckets.push(bucket);
+					}
+          buckets.sort(function(a, b) {
+              return parseFloat(a.min) - parseFloat(b.min);
+          });
+					// get the second last index
+					var lastindex = nodelistItem.length-1;
+					var lastbucket = parseInt(nodelistItem[lastindex].value);
+					var str = nodelistItem[lastindex].id
+					str = str.slice(0, -3);
+					// Last Bucket
+					bucket = {};
+					bucket.bucket_no = lastbucket+1;
+					bucket.name = this.$["bucketLastName"].value;
+					bucket.min =	parseInt(this.$$('#'+str+"Max").value)+1;
+					bucket.max = parseInt(this.$$('#'+str+"Max").value)+1;
+					buckets.push(bucket);
+          if(this.isvalid(buckets))
+          {
+						//change value only for display purpose
+						this.$$("#bucketCurrentMin").value=parseInt(this.$$('#'+str1+"Min").value)-1;
+						this.$$("#bucketCurrentMax").value="<"+parseInt(this.$$('#'+str1+"Min").value);
+						this.$$("#bucketLastMin").value=	parseInt(this.$$('#'+str+"Max").value)+1
+						this.$$("#bucketLastMax").value=">"+parseInt(this.$$('#'+str+"Max").value);
+            return buckets;
+          }
+          else
+            return false;
+        },
+				_addRow:function(){
+					// var table =this.querySelectorAll('#bucketsTable')[0];
+					var table = Polymer.dom(this.root).querySelector('#bucketsTable');
+					var nextIndex =table.rows.length-2;
+					var rowCnt = table.rows.length-1;        // GET TABLE ROW COUNT.
+        	var tr = table.insertRow(rowCnt);
+					//  var colCount = table.rows[0].cells.length;
+					$(tr).attr("class","style-scope cascade-bucket-range");
+					//create first column of table
+					var col1 = tr.insertCell(0);
+				 	var t1=document.createElement("input");
+						 t1.id = "bucket"+nextIndex+"row";
+						 t1.value = nextIndex;
+						 t1.disablednextIndex=true;
+						 t1.type="hidden"
+					Polymer.dom(col1).appendChild(t1);
+					var t2=document.createElement("input");
+						 t2.id = "bucket"+nextIndex+"Name";
+						 t2.value = '';
+						 t2.type="text"
+						 Polymer.dom(col1).appendChild(t2);
+					//create second column of table
+					var col2 = tr.insertCell(1);
+					var t3=document.createElement("input");
+						 t3.id = "bucket"+nextIndex+"Min";
+						 t3.value ='' ;
+						 t3.type="number"
+						 Polymer.dom(col2).appendChild(t3);
+					//create third column of table
+					var col3 = tr.insertCell(2);
+					var t4=document.createElement("input");
+						 t4.id = "bucket"+nextIndex+"Max";
+						 t4.value = '';
+						 t4.type="number";
+						 Polymer.dom(col3).appendChild(t4);
+					//create fourth column
+					var col4 = tr.insertCell(3);
+					var deleteButton = document.createElement('paper-button');
+	        deleteButton.raised = true;
+					$(deleteButton).attr("class", "btn btn-success deleteButton");
+					deleteButton.addEventListener('tap', this._deleteRow, true);
+					var icon = document.createElement("i");
+					icon.setAttribute("class", "fa fa-trash-o");
+					deleteButton.appendChild(icon);
+					Polymer.dom(col4).appendChild(deleteButton);
+				},
+				_deleteRow:function(o){
+					var p = event.currentTarget.parentElement.parentNode;
+					// console.log(p);
+					p.parentNode.removeChild(p);
+					var nodelistItem = Polymer.dom(this.root).querySelectorAll("[id$='row'][id^='bucket']");
+					var bucketRows =nodelistItem.length;
+					// console.log(nodelistItem);
+					for(var i=0;i<bucketRows;i++){
+					var str=nodelistItem[i].id
+					var str = str.slice(0, -3);
+					this.$$('#'+str+"row").value=i+1;
+					this.$$('#'+str+"row").setAttribute("id", "bucket"+(i+1)+"row");
+					this.$$('#'+str+"Name").setAttribute("id", "bucket"+(i+1)+"Name");
+					this.$$('#'+str+"Min").setAttribute("id", "bucket"+(i+1)+"Min");
+					this.$$('#'+str+"Max").setAttribute("id", "bucket"+(i+1)+"Max");
+					}
+				},
+				resetTable:function(){
+					console.log("ResetTable");
+					// $("#bucketsTable").html(this.originalState);
+					this.$.bucketsTable.innerHTML=this.originalState;
+					var table =this.querySelectorAll('#bucketsTable')[0];
+					var rowCount = table.rows.length-1;
+					for(var i=2;i<rowCount;i++){
+						var rows = table.rows[i];
+						rows.cells[3].childNodes[1].addEventListener('tap', this._deleteRow, true);
+					}
+				},
+				attached:function(){
+					this.originalState = $("#bucketsTable").html();
+				}
+    });
+</script>
+</body>
+</html>
