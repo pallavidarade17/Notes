@@ -1,0 +1,408 @@
+-------------------------My code----------------------------------------------------------------------------
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+  <style>
+.priorDropDown{
+      /* margin-left: 12em;
+      margin-right: 3em; */
+      width: -webkit-fill-available;
+}
+.exportButton{
+    /* margin-left: 54%; */
+}
+/* .exportButton paper-button{
+  margin-bottom: 5px;
+  width: 36%;
+} */
+.test{
+  background: #80808054;
+  width: 90%;
+  height: 30px;
+  font-size: 12px;
+  padding-top: 2px;
+  padding-bottom: 0px;
+  margin-bottom: 2%;
+}
+.kpicard1{
+    padding-top: 10px;
+    text-align: center;
+    padding: 10px 0px 10px;
+    /* border: 2px solid #e5e5e5; */
+    border-radius: 6px;
+   /* margin: 15px 0;*/
+   background-color:#a7a7a770;
+}
+h3.style-scope.prior-coverage-dashboard {
+  font-weight: bolder;
+}
+#priorDropDown1 iron-dropdown#dropdown, #priorDropDown2 iron-dropdown#dropdown{
+  width:216px !important
+
+}
+#displayTable table{
+}
+#displayTable tr{
+
+  line-height: 30px;
+}
+#displayTable td{
+  padding-left: 1em;
+  width:10%;
+  font-size: 14px;
+  font-family: inherit;
+  height: 38px;
+  border-bottom: 1px solid #0000003b;
+}
+#displayTable th{
+  width: 10%;
+}
+.dot{
+    border:1px solid #0000009c;
+    height: 15px;
+    width: 15px;
+    background-color: #46ad00;
+    border-radius: 50%;
+    margin: auto;
+}
+.dotNo{
+    border:1px solid #0000009c;
+    height: 15px;
+    width: 15px;
+    background-color: #fff;
+    border-radius: 50%;
+    margin: auto;
+}
+.rotateCat{
+  -ms-transform:rotate(270deg); /* IE 9 */
+  -moz-transform:rotate(270deg); /* Firefox */
+  -webkit-transform:rotate(270deg); /* Safari and Chrome */
+  -o-transform:rotate(270deg); /* Opera */
+}
+td.rotateCat {
+    padding-left: 1.6em !important;
+}
+#tableHead th {
+    text-align: center;
+}
+th.head {
+    border-bottom: 1px solid grey;
+}
+  </style>
+<dom-module id="prior-coverage-dashboard">
+  <template>
+  <iron-ajax auto url="./Prior_Coverage_Static.json" handle-as="json" last-response="{{priorCoverageData}}"></iron-ajax>
+  <!-- <paper-material style="height:auto; text-align:left; margin:10px; background-color: white;padding: 10px;"> -->
+  <div class="mainDiv">
+      <!-- <table id="apps"></table> -->
+<div class="row">
+  <div class="col-sm-10">
+    <div id="displayTable" class="table-responsive">
+          <table class="table1">
+      <thead id="tableHead">
+        <tr>
+          <!-- <th></th>
+          <th></th>
+          <th>Adjustments</th>
+    			<th>Coverage</th>
+          <th>Opening</th> -->
+        </tr>
+      </thead>
+          <tbody id="tableBody">
+
+          </tbody>
+    </table>
+    </div>
+
+    </div>
+    <div class="col-sm-2">
+        <div class="row">
+          <paper-dropdown-menu id="priorDropDown1" class="priorDropDown" label="Tier II business" noink no-animations>
+            <paper-listbox slot="dropdown-content" class="dropdown-content">
+              <paper-item>Healthcare HQ</paper-item>
+              <paper-item>Life Sciences</paper-item>
+              <paper-item>SHS</paper-item>
+              <paper-item>HCIT</paper-item>
+              <paper-item>ALL</paper-item>
+            </paper-listbox>
+          </paper-dropdown-menu>
+        </div>
+        <div class="row">
+            <paper-dropdown-menu id="priorDropDown2" class="priorDropDown" label="Region" noink no-animations>
+            <paper-listbox slot="dropdown-content" class="dropdown-content">
+              <paper-item>ASIA</paper-item>
+              <paper-item>EMEA</paper-item>
+              <paper-item>NAM</paper-item>
+              <paper-item>LATAM</paper-item>
+              <paper-item>ALL</paper-item>
+            </paper-listbox>
+          </paper-dropdown-menu>
+          <div class="row">
+              <span class="priorDropDown" >
+              <paper-button raisedButton id="goQuery" on-tap="_loadFilterdata" style="border-radius: 28px;margin-left: 12em;" class="btn btn-success">GO</paper-button>
+            </span>
+          </div>
+
+        </div>
+      <div>
+        <h2 style="font-weight: bold;">Report Extacts</h2>
+        <span class="exportButton"><paper-button raisedButton id="byodbtnExport" class="test" on-tap="extractOutput2" >Issue $ Schedule II</paper-button></span>
+        <span class="exportButton"><paper-button raisedButton id="byodbtnExport" class="test" on-tap="extractOutput2" class="btn btn-success">Ao History</paper-button></span>
+        <span class="exportButton"><paper-button raisedButton id="byodbtnExport" class="test" on-tap="extractOutput2" class="btn btn-success">Workpapers</paper-button></span>
+    </div>
+    <div>
+      <h2 style="font-weight: bold;">Helpful Links</h2>
+      <span class="exportButton"><paper-button raisedButton id="byodbtnExport" class="test" on-tap="extractOutput2" class="btn btn-success">B/S category mapping</paper-button></span>
+      <span class="exportButton"><paper-button raisedButton id="byodbtnExport" class="test" on-tap="extractOutput2" class="btn btn-success">SQL query</paper-button></span>
+      <span class="exportButton"><paper-button raisedButton id="byodbtnExport" class="test" on-tap="extractOutput2" class="btn btn-success">Help</paper-button></span>
+  </div>
+    </div>
+</div>
+<div class="row">
+  <span class="col-sm-2">
+    <div class="kpicard1" style="background-color: #1e86ae;">
+      <h3 style="color:#fff">Audit Opinion</h3>
+      <h3 style="color:#fff">3-trimester trend</h3>
+    </div></span>
+  <span class="col-sm-2">
+    <div class="kpicard1">
+      <H3>&nbsp;{{abc}}92&nbsp;</H3>
+      <H3># Satisfactory</H3>
+    </div></span>
+  <span class="col-sm-2">
+    <div class="kpicard1">
+      <H3>&nbsp;{{abc}}27&nbsp;</H3>
+      <H3># Needs Improv.</H3>
+    </div></span>
+  <span class="col-sm-2">
+    <div class="kpicard1">
+      <H3>&nbsp;{{abc}}73&nbsp;</H3>
+      <H3># Unacceptable</H3>
+    </div>
+  </span>
+  <span class="col-sm-4"></span>
+
+</div>
+  </div>
+<!-- </paper-material> -->
+  </template>
+</dom-module>
+</body>
+<script>
+Polymer({
+  is:"prior-coverage-dashboard",
+  properties:{
+    priorCoverageData : {
+     type: Array,
+     notify: true,
+     reflectToAttribute: true,
+     value: {},
+     observer:'drawTable'
+   },
+   tableData:{
+     type: Array,
+     notify: true,
+     reflectToAttribute: true,
+     value: []
+   }
+  },
+  ready:function(){
+    // this.drawTable();
+  },
+  attached:function(){
+
+  },
+  drawTable:function(){
+    if(Object.keys(this.priorCoverageData).length>0){
+    var headers=this.priorCoverageData.headers;
+    this.tableData = this.priorCoverageData.data;
+    var col= Object.keys(this.tableData[0]);
+
+      var headRow1 = "<tr>";
+    	var headRow2 = "<tr>";
+    	for(var i=0; i< headers.length; i++)
+    	{
+    		if(headers[i].subheaders)
+    		{
+    			headRow1 += "<th class='head' colspan=" + headers[i].subheaders.length + ">" + headers[i].name + "</th>";
+    			for(var j = 0; j < headers[i].subheaders.length; j++ )
+    			{
+    				//console.log(headers[i].subheaders[j].name)
+    				headRow2 += "<th class='head'>" + headers[i].subheaders[j].name + "</th>";
+    			}
+    		}
+    		else
+    		{
+    			headRow1 += "<th rowspan=2></th>";
+    		}
+    	}
+    	headRow2+="</tr>";
+    	headRow1+="</tr>";
+      $("#tableHead").html(headRow1+headRow2);
+
+      this.html = "";
+      var counts = {};
+      for (var i = 0; i < this.tableData.length; i++) {
+        var cat = this.tableData[i]["Category"];
+        counts[cat] = counts[cat] ? counts[cat] + 1 : 1;
+      }
+      console.log(counts);
+      for (key in counts)
+      {
+        this.createTableContent(counts[key],key);
+      }
+      // var assets=0,other=0,liabilities=0;
+      // for (var i = 0; i < this.tableData.length; i++) {
+      //   if(this.tableData[i]["Category"]=="Assets"){assets++;}
+      //   if(this.tableData[i]["Category"]=="Other"){other++;}
+      //   if(this.tableData[i]["Category"]=="Liabilities"){liabilities++;}
+      // }
+    // this.createTableContent(assets,"Assets");
+    // this.createTableContent(liabilities,"Liabilities");
+    // this.createTableContent(other,"Other");
+    console.log(this.html);
+    $("#tableBody").html(this.html);
+
+  }
+},//drawtable
+createTableContent:function(rowSpanCount,category){
+  var col= Object.keys(this.tableData[0]);
+  this.html+="<tr>";
+  this.html+="<td class='rotateCat' rowspan="+rowSpanCount+">"+category+"</td>";
+  for (var i = 0; i < this.tableData.length; i++) {
+    if(this.tableData[i]['Category']==category){
+      for (var j = 1; j <col.length; j++) {
+        if(col[j].startsWith("coverage")){
+        if(this.tableData[i][col[j]]>=1){
+          this.html+= "<td><div class='dot'></div></td>";
+        }else  if(this.tableData[i][col[j]]==0 || this.tableData[i][col[j]]==null){
+          this.html+= "<td><div class='dotNo'></div></td>";
+        }
+      }
+      else if((!col[j].startsWith("coverage")) && this.tableData[i][col[j]]==null){
+        this.html+= "<td>  </td>";
+      }
+      else{
+          this.html+= "<td>"+ this.tableData[i][col[j]]+ "</td>";
+        }
+
+      }
+    this.html+= "</tr>";
+  }
+}
+}
+})
+</script>
+</html>
+
+
+
+-=======================================================================================================================================
+Atul's Code
+=========================================================================================================================================
+
+<div id="test"></div>
+		
+<script>
+
+// Changes completed in microservice to return data in this format
+var resp = {"headers": [{"name": "Category"}, {"name": "Balance sheet category"}, {"subheaders": [{"name": "3T2015"}, {"name": "3T2016"}, {"name": "3T2017"}], "name": "Adjustment"}, {"subheaders": [{"name": "Aged"}, {"name": "Open"}, {"name": "Pending"}], "name": "Schedule II"}], "data": [{"Category": "Assets", "Balance sheet category": "Account Receivables", "3T2015": "", "3T2016": "", "3T2017": 3446994.8, "Aged": 0, "Open": 10, "Pending": 0}, {"Category": "Assets", "Balance sheet category": "Goodwill", "3T2015": "", "3T2016": "", "3T2017": 245760.0, "Aged": 0, "Open": 1, "Pending": 0}, {"Category": "Assets", "Balance sheet category": "Intangible Assets", "3T2015": "", "3T2016": "", "3T2017": 0.0, "Aged": 0, "Open": 4, "Pending": 0}, {"Category": "Assets", "Balance sheet category": "Inventory", "3T2015": 36503035.62, "3T2016": 2544454.0, "3T2017": 9384486.93, "Aged": 0, "Open": 38, "Pending": 90}, {"Category": "Assets", "Balance sheet category": "Other Assets", "3T2015": "", "3T2016": "", "3T2017": 0.0, "Aged": 0, "Open": 1, "Pending": 0}, {"Category": "Liabilities", "Balance sheet category": "Accounts Payable", "3T2015": 0.0, "3T2016": 462267.0, "3T2017": "", "Aged": 0, "Open": 6, "Pending": 10}, {"Category": "Liabilities", "Balance sheet category": "Other Liabilities", "3T2015": "", "3T2016": 1139967.0, "3T2017": 1549886.02, "Aged": 0, "Open": 15, "Pending": 0}, {"Category": "Other", "Balance sheet category": "Compliance/Disclosure", "3T2015": "", "3T2016": 0.0, "3T2017": 0.0, "Aged": 0, "Open": 20, "Pending": 70}, {"Category": "Other", "Balance sheet category": "FX", "3T2015": "", "3T2016": 935024.0, "3T2017": "", "Aged": 0, "Open": 7, "Pending": 0}, {"Category": "Other", "Balance sheet category": "IT/Other", "3T2015": "", "3T2016": 10108521.0, "3T2017": 0.0, "Aged": 0, "Open": 293, "Pending": 145}, {"Category": "Other", "Balance sheet category": "Intercompany", "3T2015": "", "3T2016": 1110640.0, "3T2017": 0.0, "Aged": 0, "Open": 10, "Pending": 0}, {"Category": "Other", "Balance sheet category": "Other", "3T2015": 6791136.66, "3T2016": "", "3T2017": "", "Aged": 0, "Open": 14, "Pending": 70}, {"Category": "Other", "Balance sheet category": "Revenue", "3T2015": 0.0, "3T2016": 1908831.53, "3T2017": 2715548.48, "Aged": 0, "Open": 104, "Pending": 10}]};
+
+headers = resp.headers;
+data = resp.data;
+
+			
+	var tableStart = "<table border=1>";
+	var headRow1 = "<tr>";
+	var headRow2 = "<tr>";
+	var tableData;
+	var tableEnd = "</table>";
+	for(var i=0; i< headers.length; i++)
+	{ 
+		if(headers[i].subheaders)
+		{
+			headRow1 += "<td colspan=" + headers[i].subheaders.length + ">" + headers[i].name + "</td>";
+			for(var j = 0; j < headers[i].subheaders.length; j++ )
+			{ 
+				//console.log(headers[i].subheaders[j].name) 
+				headRow2 += "<td>" + headers[i].subheaders[j].name + "</td>";
+			}
+		}
+		else
+		{
+			console.log("headers[i].name: "+headers[i].name);
+			headRow1 += "<td rowspan=2>" + headers[i].name + "</td>";
+		}
+	}		
+	headRow2+="</tr>";
+	headRow1+="</tr>";
+	
+	tableData = "";
+	var category = null;
+	var categoryRow = "";
+	var categoryData = "";
+	var rowspanCntr = 0;
+	for(var i=0; i< data.length; i++)
+	{
+		console.log("Row: "+(i+1)+" :: Category: "+category);
+		if(category == null)
+		{
+			category = data[i]["Category"];	
+			var dataKeys = Object.keys(data[i]);
+			for(var j = 1; j < dataKeys.length; j++ )
+			{
+				categoryRow += "<td>" + data[i][dataKeys[j]] + "</td>";
+			}
+			rowspanCntr++;			
+		}
+		else if(category == data[i]["Category"])
+		{
+			var dataKeys = Object.keys(data[i]);
+			categoryData += "<tr>";
+			for(var j = 1; j < dataKeys.length; j++ )
+			{
+				categoryData += "<td>" + data[i][dataKeys[j]] + "</td>";
+			}
+			rowspanCntr++;
+			categoryData += "</tr>";
+		}
+		else if(category != data[i]["Category"])// When category changes
+		{
+			console.log("rowspanCntr: "+rowspanCntr);
+			categoryRow = "<tr><td rowspan=" + rowspanCntr + ">"+category+"</td>" + categoryRow + "</tr>";
+			tableData += (categoryRow + categoryData);
+			
+			categoryRow = "";
+			categoryData = "";
+			rowspanCntr = 0;
+			
+			console.log("Old Category: "+category);
+			category = data[i]["Category"];
+			console.log("New Category: "+category);
+			
+			var dataKeys = Object.keys(data[i]);
+			for(var j = 1; j < dataKeys.length; j++ )
+			{
+				categoryRow += "<td>" + data[i][dataKeys[j]] + "</td>";
+			}
+			rowspanCntr++;
+			
+		}
+	}
+	
+	//Last Category records
+	console.log("rowspanCntr: "+rowspanCntr);
+	categoryRow = "<tr><td rowspan=" + rowspanCntr + ">"+category+"</td>" + categoryRow + "</tr>";
+	tableData += (categoryRow + categoryData);
+	
+	categoryRow = "";
+	categoryData = "";
+	rowspanCntr = 0;
+	
+	document.getElementById("test").innerHTML = (tableStart+headRow1+headRow2+tableData+tableEnd);
+	
+</script>
+
+
