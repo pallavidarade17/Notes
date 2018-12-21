@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+  .rowContainer{
+      display: grid;
+      grid-template-columns: 25% 25% 25% 25%  auto;
+      width: 100%;
+      margin: 0 0.8em;
+  }
+  .buttonClass{
+   height: 1.8rem;
+    border-color: #000000b0;
+    background-color: #000000c7;
+    font-size: 11px;
+  }
+  .buttonClass:hover{
+  border-color: #332f2fba;
+  background-color: #332f2fba;
+  }
+  /* label.style-scope.cascade-mars-main {
+    font-size: smaller;
+    margin-left: 15px;
+  } */
+  .filterDiv{
+  height: 170px;
+  overflow-y: auto;
+  border: 1px solid #0000001a;
+  width: 100%;
+  padding: 6px;
+  overflow-x: hidden;
+  }
+  #container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  }
+  /* paper-checkbox.style-scope.cascade-mars-main.x-scope.paper-checkbox-0 {
+      display: block;
+  } */
+  paper-checkbox.style-scope.cascade-mars-main.x-scope.paper-checkbox-1 {
+    display: block;
+    padding: 4px;
+  }
+  div#checkboxLabel {
+    font-size: 12px;
+  }
+  div#checkboxContainer {
+  width: 14px !important;
+  min-width: 15px !important;
+  height: 15px !important
+  }
+  /* css for loader */
+  .overlay {
+      position: fixed;
+      bottom: 0;
+      top: -7px;
+      left: 0;
+      right: 0;
+      background: rgba(51, 51, 51, 0.6);
+      z-index: 999;
+  }
+  .loader:after {
+    left: 1.5em;
+  }
+  @-webkit-keyframes load1 {
+    0%,
+    80%,
+    100% {
+      box-shadow: 0 0;
+      height: 4em;
+    }
+    40% {
+      box-shadow: 0 -2em;
+      height: 5em;
+    }
+  }
+  @keyframes load1 {
+    0%,
+    80%,
+    100% {
+      box-shadow: 0 0;
+      height: 4em;
+    }
+    40% {
+      box-shadow: 0 -2em;
+      height: 5em;
+    }
+  }
+  .loader, .loader:before, .loader:after {
+      background: #5bc0de;
+      -webkit-animation: load1 1s infinite ease-in-out;
+      animation: load1 1s infinite ease-in-out;
+      width: 1em;
+      height: 3em;
+  }
+  .loader {
+      color: #5bc0de;
+      text-indent: -9999em;
+      /* margin: 88px auto; */
+      position: fixed;
+      font-size: 11px;
+      -webkit-transform: translateZ(0);
+      -ms-transform: translateZ(0);
+      transform: translateZ(0);
+      -webkit-animation-delay: -0.16s;
+      animation-delay: -0.16s;
+      margin: 10%;
+      top: 33%;
+      left: 39%;
+      z-index: 9;
+      height: 100%;
+  }
+  .loader:before,
+  .loader:after {
+    position: absolute;
+    top: 0;
+    content: '';
+  }
+  .loader:before {
+    left: -1.5em;
+    -webkit-animation-delay: -0.32s;
+    animation-delay: -0.32s;
+  }
+  div#radioLabel {
+    font-size: 13px;
+}
+label.style-scope.cascade-mars-main {
+    font-size: 15px;
+}
+  </style>
+</head>
+<body>
+<dom-module id="cascade-mars-main">
+  <template>
+    <iron-ajax id="getQuarter" url="/api/mars/controller/quarterData" handle-as="json" method="post" last-response="{{quarterData}}"> </iron-ajax>
+    <iron-ajax id="getMARSData" url="/api/mars/controller/loadMarsData/" method="post" last-response="{{mars_data}}" on-response="_loadTable" on-error="_errorSummaryData"></iron-ajax>
+    <iron-ajax id="exportMARSData" url="/api/mars/controller/loadMarsData/export/" method="post" last-response="{{exportResponse}}" on-error="_errorSubmitData" on-response="_downloadData"></iron-ajax>
+    <div id="loadingmessage" class="overlay" style="display:none">
+      <div class="loader"></div>
+    </div>
+
+    <div style="padding:4px;height:auto;;width:100%;background-color:#e6e6e6">
+      <div class="mars-header" style="margin: 1rem;">
+        <h3 style="font-weight: 400;line-height: 35px;text-align: left;">MARS Data
+          <small style="color: #868686;margin-left: 5px;font-size: 20px;">Last 8 quarter financial
+          </small>
+        </h3>
+      </div>
+  <paper-material style="height:auto; text-align:left;background-color: white;margin: 0.3rem;padding: 0.7rem;margin-bottom: 10px;">
+
+      <div class="row" style="margin-top: 10px;margin-left: 35px;">
+          <div class="col-sm-2 col-md-2" >
+               <label>Select business:</label>
+              <font color="red">*</font>
+              <div class="horizontal-section filterDiv">
+                <paper-checkbox noink id="businessAll" on-iron-change="_selectAllBusiness" value="Select all">Select all</paper-checkbox>
+              <paper-listbox id="myBusinessList" multi selected-values="{{selected_business_value}}" attr-for-selected="value">
+                <template is="dom-repeat" items="{{businessValues}}">
+                <paper-checkbox name="business" noink value="{{item.val}}">{{item.key}}</paper-checkbox>
+                </template>
+              </paper-listbox>
+            </div>
+          </div>
+          <div class="col-sm-2 col-md-2">
+              <label>Select currency</label>
+              <div>
+                <paper-radio-group id="currencyDiv"  selected="{{selected_currency}}" on-paper-radio-group-changed='_getPeriodNames'>
+                    <paper-radio-button  name='FUNCM' noink>FUNCM</paper-radio-button><br>
+                    <paper-radio-button  name='ORINM' noink>ORINM</paper-radio-button><br>
+                    <paper-radio-button   name='USDRQ' noink>USDRQ</paper-radio-button>
+                </paper-radio-group>
+              </div>
+          </div>
+          <div class="col-sm-2 col-md-2">
+              <label>Period Names</label>
+              <div class="horizontal-section filterDiv">
+                <paper-checkbox noink id="quarterAll" on-iron-change="_selectAllPeriod" value="Select all">Select all</paper-checkbox>
+              <paper-listbox id="periodList" multi selected-values="{{selected_period}}" attr-for-selected="value">
+                <template is="dom-repeat" items="{{quarterData}}">
+                <paper-checkbox name="periodData" noink value="{{item.periodName}}">{{item.periodName}}</paper-checkbox>
+                </template>
+              </paper-listbox>
+            </div>
+          </div>
+          <div class="col-sm-2 col-md-2">
+              <label>Select columns:</label>
+              <div class="horizontal-section filterDiv">
+                <paper-checkbox noink id="columnsAll" on-iron-change="_selectAllColumns" value="Select all">Select all</paper-checkbox>
+              <paper-listbox id="myColumnList" multi selected-values="{{selected_cols}}" attr-for-selected="value">
+                <template is="dom-repeat" items="{{columnList}}">
+                <paper-checkbox name="columnData" noink value="{{item.val}}">{{item.key}}</paper-checkbox>
+                </template>
+              </paper-listbox>
+            </div>
+          </div>
+          <div class="col-sm-2 col-md-2">
+            <label>Enter Legal Entity IDs:</label>
+            <div style="margin-left:2px">
+              <textarea id="txt_LE_IDs" value='' name="strLE_IDs" cols="20" rows="4" style="width:200px;Height:125px;"></textarea>
+              <p style="font-size: 12px"><font color="red">Note:Please enter comma separated Legal Entity IDs</font></p>
+            </div>
+          </div>
+        </div>
+
+          <div class="row" style="margin-top:30px;margin-left: 35px;margin-bottom: 30px;">
+            <div class="col-lg-12 col-md-12 hidden-sm hidden-xs">
+              <paper-button raisedButton id="btnSearch" on-tap="_showData" class="buttonClass btn btn-success" disabled>Show Data</paper-button>
+              <paper-button raisedButton id="btnClear" on-tap="_clearFilters" class="buttonClass btn btn-success" disabled>Clear Filters</paper-button>
+              <paper-button raisedButton id="btn_download" on-tap="_uploadData" class="buttonClass btn btn-success" disabled>Export</paper-button>
+            </div>
+        </div>
+  </paper-material>
+
+  <paper-material style="height:auto; text-align:left; margin:0.3rem; background-color: white;padding: 10px;min-height:19rem;">
+    <div class="row" style="margin-top:40px;margin-left: 35px;margin-right: 35px;">
+          <div class="col-lg-12 col-md-12 hidden-sm hidden-xs" style="margin-bottom: 5px;">
+                <div id="dataTableController">
+            <px-data-table id="showTableHeaders" style="display:block"  hide-pagination-control="true">
+                          <px-data-table-column name='Legal Entity'></px-data-table-column>
+                          <px-data-table-column name='Period Name'></px-data-table-column>
+                          <px-data-table-column name='Period Num'></px-data-table-column>
+                          <px-data-table-column name='Period Year'></px-data-table-column>
+                          <px-data-table-column name='Management Entity'></px-data-table-column>
+                          <px-data-table-column name='ME Description'></px-data-table-column>
+                          <px-data-table-column name='ME - Description'></px-data-table-column>
+                          <px-data-table-column name='LE Description'></px-data-table-column>
+                          <px-data-table-column name='Account'></px-data-table-column>
+                          <px-data-table-column name='Account Description'></px-data-table-column>
+                          <px-data-table-column name='Account - Description'></px-data-table-column>
+                          <px-data-table-column name='Account GL Number'></px-data-table-column>
+                          <px-data-table-column name='Interco Me'></px-data-table-column>
+                          <px-data-table-column name='Interco Le'></px-data-table-column>
+                          <px-data-table-column name='Analysis'></px-data-table-column>
+                          <px-data-table-column name='Type'></px-data-table-column>
+                          <px-data-table-column name='Currency Code'></px-data-table-column>
+                          <px-data-table-column name='Ytd Balance SUM'></px-data-table-column>
+                          <px-data-table-column name='Account Type'></px-data-table-column>
+                          <px-data-table-column name='Last Update Date'></px-data-table-column>
+                          <px-data-table-column name='Ptd Balance SUM'></px-data-table-column>
+                          <px-data-table-column name='Org HR Manager Name'></px-data-table-column>
+                          <px-data-table-column name='Begin Balance SUM'></px-data-table-column>
+                          <px-data-table-column name='Sob Short Name'></px-data-table-column>
+                          <px-data-table-column name='Segment'></px-data-table-column>
+                          <px-data-table-column name='Business'></px-data-table-column>
+                          <px-data-table-column name='Sub Business'></px-data-table-column>
+                          <px-data-table-column name='Country'></px-data-table-column>
+                          <px-data-table-column name='Gold id'></px-data-table-column>
+                          <px-data-table-column name='Bs Is'></px-data-table-column>
+                          <px-data-table-column name='Cash Flow Category'></px-data-table-column>
+                          <px-data-table-column name='CF Category Industrial'></px-data-table-column>
+                          <px-data-table-column name='CF Category Capita'></px-data-table-column>
+
+            </px-data-table>
+
+                </div>
+        </div>
+     </div>
+ </paper-material>
+    </div>
+  </template>
+</dom-module>
+</body>
+<script>
+Polymer({
+  is:"cascade-mars-main",
+  properties:{
+    sso: {
+      type: Number,
+      reflectToAttribute: true
+    },
+    selected_business_value : {
+      type: Array,
+      notify: true,
+      reflectToAttribute: true,
+      value: []
+    },
+    selected_cols : {
+      type: Array,
+      notify: true,
+      reflectToAttribute: true,
+      value: []
+    },
+    selected_period : {
+      type: Array,
+      notify: true,
+      reflectToAttribute: true,
+      value: []
+    },
+    strLE_IDs : {
+      type: Array,
+      notify: true,
+      reflectToAttribute: true,
+      value: []
+    },
+    pageSize : {
+      type: Number,
+      notify: true,
+      reflectToAttribute: true,
+      value: 10
+    },
+    selectedPage : {
+      type: Number,
+      notify: true,
+      reflectToAttribute: true,
+      value: 1
+    },
+    dataSubset:{
+      type: Array,
+      notify: true,
+      reflectToAttribute: true,
+      value: []
+    },
+    strLE_IDs:{
+      type: Array,
+      notify: true,
+      reflectToAttribute: true,
+      value: []
+    },
+    recordIndexOfSubset: {
+      type: Number,
+      value: 1,
+      notify: true
+    },
+    flagCheck: {
+      type: Boolean,
+      value: true,
+      reflectToAttribute: true
+    },
+    pageCount:{
+      type:Number,
+      value:0,
+      reflectToAttribute: true
+    },
+    selected_currency: {
+      type: String,
+      notify: true,
+      reflectToAttribute: true,
+      value:'USDRQ'
+    }
+  },
+  listeners : {
+      'px-page-change-intent' : '_paginateData',
+      'px-page-size-change-intent' : '_pageSizeChangeHandler'
+  },
+  validateSSO:function(){
+    var str = this.$.txt_LE_IDs.value.replace(/\s/g, '');
+    // console.log(this.$.txt_LE_IDs.value);
+      var regex = /^[a-zA-Z0-9]*(,[a-zA-Z0-9]*)*$/;
+      if(regex.test(str)){
+        var lines=str.split(",")
+        for (var i=0; i < lines.length; i++){
+            this.strLE_IDs.push(lines[i]);
+            this.flagCheck=true;
+       }
+     }
+     else{
+         this.flagCheck=false;
+         this.$.txt_LE_IDs.value="";
+         alert("Please enter valid LE IDs and no special characters allowed!!");
+     }
+  },
+  _showData:function(e){
+    this._resetShow();
+    this.strLE_IDs = [];
+    if (this.selected_business_value.length>=1 || this.$.txt_LE_IDs.value.trim() != "" ) {
+          if(this.$.txt_LE_IDs.value.trim()!="")
+              this.validateSSO();
+          if(this.flagCheck)
+          {
+            if(this.selected_cols.length==0){
+              this.selected_cols= ["[Legal Entity]","[Period Name]", "[Period Num]", "[Period Year]","[Management Entity]","[ME - Description]","[LE Description]",
+                "[Account]", "[Account - Description]", "[Account Description]", "[Account GL Number]","[Interco Me]","[Interco Le]","[Analysis]",
+                "[Type]","[Currency Code]","[Ytd Balance SUM]","[Account Type]","[Last Update Date]","[Ptd Balance SUM]","[Begin Balance SUM]",
+                "[Sob Short Name]","[Segment]","[Business]","[Sub Business]", "[Country]","[Gold id]","[Bs Is]","[Cash Flow Category]","[CF Category Industrial]","[CF Category Capital]"];
+            }
+            var filterArr =[];
+            if(this.selected_business_value.length!=0){
+              filterArr.push({"columnName":"business", "values":this.selected_business_value })
+            }
+            if(this.selected_period.length!=0){
+              filterArr.push({"columnName":"period", "values":this.selected_period})
+            }
+            if(this.strLE_IDs.length!=0){
+              filterArr.push({"columnName":"leIDs", "values":this.strLE_IDs })
+            }
+            this.filters = filterArr;
+        var params = {
+                "page_no": this.selectedPage,
+                "page_size": this.pageSize,
+                "col_names": this.selected_cols,
+                "selected_currency":this.selected_currency,
+                "filters":this.filters
+              }
+        // console.log(params);
+          this._getAjaxData(params)
+          }
+        }
+        else {
+            alert('Please select at least one Business or input LE IDs !!');
+          }
+  },
+  _loadTable:function(e){
+    this.dataSubset=[];
+    if(e.detail.response!=null && e.detail.response!=""){
+    this.$.showTableHeaders.style.display="none";
+    this._calcfirstItemIndex();
+    this.totalRecordsCount=this.mars_data.totalRecCount
+    this.dataSubset=this.mars_data.results
+       var element =  $("#marspxDatatable");
+       if (typeof(element) != 'undefined' && element != null){element.remove();}
+       var newElem = document.createElement("px-data-table");
+       newElem.id="marspxDatatable";
+       $(newElem).attr("data-remote", JSON.stringify(true));
+       $(newElem).attr("total-entries", JSON.stringify(this.totalRecordsCount));
+       $(newElem).attr("first-item-index", JSON.stringify(this.recordIndexOfSubset));
+       $(newElem).attr("table-data", JSON.stringify(this.dataSubset));
+       $(newElem).attr("page-size", JSON.stringify(this.pageSize));
+       $(newElem).attr("on-app-localize-resources-loaded",this.disableAnimation)
+      $('#dataTableController').append(newElem);
+  }else{
+    alert("No record found !! please modify your filters and try again.")
+    setTimeout(function(){ document.getElementById("loadingmessage").style.display = "none"; },100);
+  }
+  },
+  disableAnimation:function(){
+  setTimeout(function(){ document.getElementById("loadingmessage").style.display = "none"; },2000);
+  },
+  _errorSummaryData: function(event){
+    alert("Error in response.Please try again")
+    setTimeout(function(){ document.getElementById("loadingmessage").style.display = "none"; },2000);
+    },
+  _errorSubmitData:function(){
+      alert("Error in upload.Please try again")
+    },
+  _calcfirstItemIndex(){
+    if(this.selectedPage>=1){
+    var currentpage = this.selectedPage-1
+    var pagedata =this.pageSize;
+    this.recordIndexOfSubset = pagedata*currentpage+1;
+  }
+  },
+  _paginateData:function(evt){
+    // console.log(evt.detail);
+    this.selectedPage = evt.detail;
+    // var pageSelected = evt.detail;
+    var params = {
+            "page_no": this.selectedPage,
+            "page_size": this.pageSize,
+            "col_names": this.selected_cols,
+            "selected_currency":this.selected_currency,
+            "filters":this.filters
+          }
+    this._getAjaxData(params)
+  },
+  _pageSizeChangeHandler:function(evt){
+    // console.log(evt.detail);
+    if(this.pageCount==3){
+      this.pageCount=0;
+      this.pageSize = evt.detail;
+      this.dataSubset =[];
+      this.selectedPage=1;
+      var params = {
+              "page_no": this.selectedPage,
+              "page_size": this.pageSize,
+              "col_names": this.selected_cols,
+              "selected_currency":this.selected_currency,
+              "filters":this.filters
+            }
+      this._getAjaxData(params)
+    }
+    else{
+      this.pageCount++;
+    }
+  },
+  _getAjaxData:function(params){
+    document.getElementById("loadingmessage").style.display = "block";
+    this.$.getMARSData.contentType="application/json";
+    this.$.getMARSData.body = params;
+    this.$.getMARSData.generateRequest();
+  },
+  _clearFilters:function(e){
+    this.selected_business_value=[];
+    this.selected_cols=[];
+    this.selected_period=[];
+    this.filters=[];
+    this.$.txt_LE_IDs.value="";
+    this.flagCheck =true;
+    //to uncheck all checkboxes
+    var business = document.getElementsByName('business');
+    var period = document.getElementsByName('periodData');
+    var columns = document.getElementsByName('columnData');
+    this.$.businessAll.checked=false
+    for(var i=0;i<business.length;i++) {
+      business[i].checked=false
+    }
+    this.$.quarterAll.checked=false;
+    for(var i=0;i<period.length;i++) {
+      period[i].checked=false
+    }
+    this.$.columnsAll.checked=false;
+    for(var i=0;i<columns.length;i++) {
+      columns[i].checked=false
+    }
+    this.pageSize=10;
+    this.selectedPage=1;
+    this.totalRecordsCount= 0;
+    this.recordIndexOfSubset=1
+    this.dataSubset=[]
+    var element =  $("#marspxDatatable");
+    if (typeof(element) != 'undefined' && element != null){element.remove();}
+    this.$.showTableHeaders.style.display="block";
+  },
+  _resetShow:function(){
+    var element =  $("#marspxDatatable");
+    if (typeof(element) != 'undefined' && element != null){element.remove();}
+    this.$.showTableHeaders.style.display="block";
+  },
+  _uploadData:function(e){
+    this.strLE_IDs = [];
+    if (this.selected_business_value.length>=1 || this.$.txt_LE_IDs.value.trim() != "" ) {
+        if(this.$.txt_LE_IDs.value.trim()!="")
+            this.validateSSO();
+        if(this.flagCheck)
+        {
+          if(this.selected_cols.length==0){
+            this.selected_cols= ["[Legal Entity]","[Period Name]", "[Period Num]", "[Period Year]","[Management Entity]","[ME - Description]","[LE Description]",
+                "[Account]", "[Account - Description]", "[Account Description]", "[Account GL Number]","[Interco Me]","[Interco Le]","[Analysis]",
+                "[Type]","[Currency Code]","[Ytd Balance SUM]","[Account Type]","[Last Update Date]","[Ptd Balance SUM]","[Begin Balance SUM]",
+                "[Sob Short Name]","[Segment]","[Business]","[Sub Business]", "[Country]","[Gold id]","[Bs Is]",
+                "[Cash Flow Category]","[CF Category Industrial]","[CF Category Capital]"]
+          }
+            var filterArr =[];
+            if(this.selected_business_value.length!=0){
+              filterArr.push({"columnName":"business", "values":this.selected_business_value })
+            }
+            if(this.selected_period.length!=0){
+              filterArr.push({"columnName":"period", "values":this.selected_period})
+            }
+            if(this.strLE_IDs.length!=0){
+              filterArr.push({"columnName":"leIDs", "values":this.strLE_IDs })
+            }
+            this.filters = filterArr;;
+        var params = {
+                "sso": this.sso,
+                "col_names": this.selected_cols,
+                "filters":this.filters,
+                "selected_currency":this.selected_currency
+              }
+          this.$.exportMARSData.contentType="application/json";
+          this.$.exportMARSData.body = params;
+          this.$.exportMARSData.generateRequest();
+          document.getElementById("loadingmessage").style.display = "block";
+      }
+    }
+    else {
+            alert('Please select at least one Business or SSO ID !!');
+          }
+  },
+  _downloadData:function(e){
+    document.getElementById("loadingmessage").style.display = "none";
+    if(e.detail.response!=null && e.detail.response!=""){
+      var response = e.detail.response;
+      if(response.type=="job")
+      {
+        alert(response.message);
+      }
+      else if(response.type=="file")
+      {
+        alert(response.message);
+        var filename = response.filename
+        var link = document.createElement("a");
+        link.href = "/api/mars/controller/marsdata/download/"+filename;
+        link.style = "visibility:hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    }
+    else{
+      alert("No record found !! please modify your filters and try again.");
+    }
+  },
+  _selectAllBusiness:function(e){
+     this.selected_business_value=[];
+      var checkboxes = document.getElementsByName('business');
+      var arr =[];
+    if(this.$.businessAll.checked==true){
+        for(var i=0;i<checkboxes.length;i++) {
+        checkboxes[i].checked=true
+        arr.push(checkboxes[i].value)
+      }
+      this.selected_business_value =arr;
+    }else if(this.$.businessAll.checked==false){
+        for(var i=0;i<checkboxes.length;i++) {
+        checkboxes[i].checked=false
+      }
+      this.selected_business_value=[];
+    }
+  },
+ _selectAllColumns:function(e){
+  this.selected_cols=[];
+  var checkboxes = document.getElementsByName('columnData');
+  if(this.$.columnsAll.checked==true){
+  for(var i=0;i<checkboxes.length;i++) {
+    checkboxes[i].checked=true
+      this.selected_cols.push(checkboxes[i].value)
+    }
+  }else if(this.$.columnsAll.checked==false){
+    for(var i=0;i<checkboxes.length;i++) {
+      checkboxes[i].checked=false
+      this.selected_cols=[];
+     }
+   }
+ },
+ _selectAllPeriod:function(){
+   this.selected_period=[];
+   var checkboxes = document.getElementsByName('periodData');
+   if(this.$.quarterAll.checked==true){
+   for(var i=0;i<checkboxes.length;i++) {
+     checkboxes[i].checked=true
+       this.selected_period.push(checkboxes[i].value)
+     }
+   }else if(this.$.quarterAll.checked==false){
+     for(var i=0;i<checkboxes.length;i++) {
+       checkboxes[i].checked=false
+       this.selected_period=[];
+      }
+    }
+ },
+ _getPeriodNames:function(){
+    this._clearFilters();
+    this.selected_period=[];
+   var currency = this.selected_currency;
+   var params = {
+           "selected_currency": currency
+         }
+     this.$.getQuarter.contentType="application/json";
+     this.$.getQuarter.body = params;
+     this.$.getQuarter.generateRequest();
+ },
+  ready:function(){
+    this.businessValues=[{"key": "Aviation","val": "Aviation"},{"key": "Corporate","val": "Corporate"},{"key": "EC and Lighting","val": "EC and Lighting"},
+  {"key": "Energy Infra","val": "Energy Infra"},{"key": "Energy Management","val": "Energy Management"},{"key": "GE Capital","val": "GE Capital"},{"key": "GE Power","val": "GE Power"},{"key": "Healthcare","val": "Healthcare"},
+  {"key": "Home_and_Business","val": "Home_and_Business"},{"key": "Oil_and_Gas","val": "Oil_and_Gas"},{"key": "Power and Water","val": "Power and Water"},{"key": "Renewables","val": "Renewables"},
+  {"key": "Total Company_and_Eliminations","val": "Total Company_and_Eliminations"},{"key": "Transportation","val": "Transportation"}]
+    this.columnList=[{"key": "Account","val": "[Account]"},{"key": "Account - Description","val": "[Account - Description]"},{"key": "Account Description","val": "[Account Description]"},
+  {"key": "Account GL Number","val": "[Account GL Number]"},{"key": "Account Type","val": "[Account Type]"},{"key": "Analysis","val": "[Analysis]"},
+  {"key": "Begin Balance SUM","val": "[Begin Balance SUM]"},{"key": "Bs Is","val": "[Bs Is]"},{"key": "Business","val": "[Business]"},
+  {"key": "Cash Flow Category","val": "[Cash Flow Category]"},{"key": "CF Category Capital","val": "[CF Category Capital]"},{"key": "CF Category Industrial","val": "[CF Category Industrial]"},
+  {"key": "Country","val": "[Country]"},{"key": "Currency Code","val": "[Currency Code]"},{"key": "Gold id","val": "[Gold id]"},{"key": "Interco Le","val": "[Interco Le]"},
+  {"key": "Interco Me","val": "[Interco Me]"},{"key": "Last Update Date","val": "[Last Update Date]"},{"key": "LE Description","val": "[LE Description]"},{"key": "Legal Entity","val": "[Legal Entity]"},
+  {"key": "Management Entity","val": "[Management Entity]"},{"key": "ME - Description","val": "[ME - Description]"},{"key": "Period Name","val": "[Period Name]"},
+  {"key": "Period Num","val": "[Period Num]"},{"key": "Period Year","val": "[Period Year]"},{"key": "Ptd Balance SUM","val": "[Ptd Balance SUM]"},{"key": "Segment","val": "[Segment]"},
+  {"key": "Sob Short Name","val": "[Sob Short Name]"},{"key": "Sub Business","val": "[Sub Business]"},{"key": "Type","val": "[Type]"},
+  {"key": "Ytd Balance SUM","val": "[Ytd Balance SUM]"}]
+var params = {
+        "selected_currency": this.selected_currency
+      }
+  this.$.getQuarter.contentType="application/json";
+  this.$.getQuarter.body = params;
+  this.$.getQuarter.generateRequest();
+},
+attached:function(){
+},
+})
+</script>
+
+<style>
+.px-dropdown-0 .dropcell.px-dropdown {
+    background-color: #f9f9f9 !important;
+    border: 1px solid #e8e8e8 !important;
+    border-radius: 1px !important;
+    cursor: pointer ;
+    width: 15rem;
+}
+.px-dropdown-text-0 {
+width: 92% !important;
+font-size: 13px !important;
+padding-left: 5px !important;
+}
+iron-icon.px-dropdown-chevron {
+width: 2.06667rem !important;
+height: 1.46667rem !important;
+}
+.px-dropdown-0 .dropcell.px-dropdown:hover {
+background-color: #ffffff !important;
+}
+.px-dropdown-content-0 .px-dropdown--content.px-dropdown-content {
+    background-color: #ffffff;
+    border: 1px solid #e5e5e8;
+    color: #4c4b4b;
+    font-size: 12px;
+    width: 240px !important;
+}
+.px-data-table-cell-0 .cell--value__empty.px-data-table-cell {
+    height: 2.2rem !important;
+}
+px-data-table-cell {
+    width: 22% !important;
+}
+.aha-table-0 .u-m--.aha-table {
+    margin: .33333rem!important;
+    height: 5em;
+    line-height: 2em;
+    font-weight: 500;
+    font-size: 14px;
+    color: #2287af !important;
+}
+.pagination.style-scope.aha-table {
+    border-bottom: none;
+}
+span.column-head.u-mv--.u-mh-.style-scope.aha-table {
+    color: #fff;
+    font-weight: 400;
+    text-transform: capitalize;
+}
+.tr.tr--header.style-scope.aha-table {
+      background: #00000078;
+}
+span#cellvalue {
+    font-size: 14px;
+}
+.btn-success:not(:disabled):not(.disabled).active, .btn-success:not(:disabled):not(.disabled):active, .show>.btn-success.dropdown-toggle {
+    color: #fff;
+    background-color: #00000087;
+    border-color: #00000087;
+}
+</style>
+</html>
