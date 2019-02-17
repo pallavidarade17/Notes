@@ -1,0 +1,28 @@
+.border{
+border:1px solid red;
+border-radius:20px;
+-moz-border-radius:20px;
+padding:10px;
+width:250px;
+}
+.shadow{
+background:orange;
+box-shadow: 5px 17px 5px #686868;
+padding:10px;
+width:250px;
+height:45px;
+transition:height 1.5s;
+-moz-transition:height 1.5s; /* Firefox 4 and above  */
+-webkit-transition:height 1.5s; /* Safari and Chrome */
+-o-transition:height 1.5s; /* Opera */
+}
+div.shadow:hover{
+height:80px;
+}
+.image_left{
+float:left;
+}
+.image_right{
+float:right;
+opacity:0.65;
+}
